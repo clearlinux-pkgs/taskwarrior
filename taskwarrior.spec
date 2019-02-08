@@ -4,17 +4,16 @@
 #
 Name     : taskwarrior
 Version  : 2.5.1
-Release  : 3
+Release  : 4
 URL      : https://taskwarrior.org/download/task-2.5.1.tar.gz
 Source0  : https://taskwarrior.org/download/task-2.5.1.tar.gz
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : MIT
-Requires: taskwarrior-bin
-Requires: taskwarrior-data
-Requires: taskwarrior-doc
-Requires: util-linux-dev
-BuildRequires : cmake
+Requires: taskwarrior-bin = %{version}-%{release}
+Requires: taskwarrior-license = %{version}-%{release}
+Requires: taskwarrior-man = %{version}-%{release}
+BuildRequires : buildreq-cmake
 BuildRequires : util-linux-dev
 
 %description
@@ -28,26 +27,36 @@ but for now you have to do a little bit of file shuffling.
 %package bin
 Summary: bin components for the taskwarrior package.
 Group: Binaries
-Requires: taskwarrior-data
+Requires: taskwarrior-license = %{version}-%{release}
+Requires: taskwarrior-man = %{version}-%{release}
 
 %description bin
 bin components for the taskwarrior package.
 
 
-%package data
-Summary: data components for the taskwarrior package.
-Group: Data
-
-%description data
-data components for the taskwarrior package.
-
-
 %package doc
 Summary: doc components for the taskwarrior package.
 Group: Documentation
+Requires: taskwarrior-man = %{version}-%{release}
 
 %description doc
 doc components for the taskwarrior package.
+
+
+%package license
+Summary: license components for the taskwarrior package.
+Group: Default
+
+%description license
+license components for the taskwarrior package.
+
+
+%package man
+Summary: man components for the taskwarrior package.
+Group: Default
+
+%description man
+man components for the taskwarrior package.
 
 
 %prep
@@ -58,16 +67,19 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1506374416
-mkdir clr-build
+export SOURCE_DATE_EPOCH=1549646994
+mkdir -p clr-build
 pushd clr-build
-cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=/usr/lib64 -DCMAKE_AR=/usr/bin/gcc-ar -DLIB_SUFFIX=64 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_RANLIB=/usr/bin/gcc-ranlib -DCMAKE_BUILD_TYPE=release -DENABLE_SYNC=OFF
-make VERBOSE=1  %{?_smp_mflags}
+%cmake .. -DCMAKE_BUILD_TYPE=release -DENABLE_SYNC=OFF
+make  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1506374416
+export SOURCE_DATE_EPOCH=1549646994
 rm -rf %{buildroot}
+mkdir -p %{buildroot}/usr/share/package-licenses/taskwarrior
+cp COPYING %{buildroot}/usr/share/package-licenses/taskwarrior/COPYING
+cp LICENSE %{buildroot}/usr/share/package-licenses/taskwarrior/LICENSE
 pushd clr-build
 %make_install
 popd
@@ -79,8 +91,8 @@ popd
 %defattr(-,root,root,-)
 /usr/bin/task
 
-%files data
-%defattr(-,root,root,-)
+%files doc
+%defattr(0644,root,root,0755)
 /usr/share/doc/task/AUTHORS
 /usr/share/doc/task/COPYING
 /usr/share/doc/task/ChangeLog
@@ -167,7 +179,14 @@ popd
 /usr/share/doc/task/scripts/zsh/_task
 /usr/share/doc/task/task-ref.pdf
 
-%files doc
-%defattr(-,root,root,-)
-%doc /usr/share/man/man1/*
-%doc /usr/share/man/man5/*
+%files license
+%defattr(0644,root,root,0755)
+/usr/share/package-licenses/taskwarrior/COPYING
+/usr/share/package-licenses/taskwarrior/LICENSE
+
+%files man
+%defattr(0644,root,root,0755)
+/usr/share/man/man1/task.1
+/usr/share/man/man5/task-color.5
+/usr/share/man/man5/task-sync.5
+/usr/share/man/man5/taskrc.5
