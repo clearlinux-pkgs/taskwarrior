@@ -4,7 +4,7 @@
 #
 Name     : taskwarrior
 Version  : 2.5.1
-Release  : 4
+Release  : 5
 URL      : https://taskwarrior.org/download/task-2.5.1.tar.gz
 Source0  : https://taskwarrior.org/download/task-2.5.1.tar.gz
 Summary  : No detailed summary available
