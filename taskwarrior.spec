@@ -4,7 +4,7 @@
 #
 Name     : taskwarrior
 Version  : 2.5.1
-Release  : 5
+Release  : 6
 URL      : https://taskwarrior.org/download/task-2.5.1.tar.gz
 Source0  : https://taskwarrior.org/download/task-2.5.1.tar.gz
 Summary  : No detailed summary available
@@ -28,7 +28,6 @@ but for now you have to do a little bit of file shuffling.
 Summary: bin components for the taskwarrior package.
 Group: Binaries
 Requires: taskwarrior-license = %{version}-%{release}
-Requires: taskwarrior-man = %{version}-%{release}
 
 %description bin
 bin components for the taskwarrior package.
@@ -61,25 +60,31 @@ man components for the taskwarrior package.
 
 %prep
 %setup -q -n task-2.5.1
+cd %{_builddir}/task-2.5.1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1549646994
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1604600762
 mkdir -p clr-build
 pushd clr-build
+export GCC_IGNORE_WERROR=1
+export CFLAGS="$CFLAGS -fno-lto "
+export FCFLAGS="$FFLAGS -fno-lto "
+export FFLAGS="$FFLAGS -fno-lto "
+export CXXFLAGS="$CXXFLAGS -fno-lto "
 %cmake .. -DCMAKE_BUILD_TYPE=release -DENABLE_SYNC=OFF
 make  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1549646994
+export SOURCE_DATE_EPOCH=1604600762
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/taskwarrior
-cp COPYING %{buildroot}/usr/share/package-licenses/taskwarrior/COPYING
-cp LICENSE %{buildroot}/usr/share/package-licenses/taskwarrior/LICENSE
+cp %{_builddir}/task-2.5.1/COPYING %{buildroot}/usr/share/package-licenses/taskwarrior/d97845b2126483a469d790f579ccfef7c9f0bcef
+cp %{_builddir}/task-2.5.1/LICENSE %{buildroot}/usr/share/package-licenses/taskwarrior/d97845b2126483a469d790f579ccfef7c9f0bcef
 pushd clr-build
 %make_install
 popd
@@ -181,8 +186,7 @@ popd
 
 %files license
 %defattr(0644,root,root,0755)
-/usr/share/package-licenses/taskwarrior/COPYING
-/usr/share/package-licenses/taskwarrior/LICENSE
+/usr/share/package-licenses/taskwarrior/d97845b2126483a469d790f579ccfef7c9f0bcef
 
 %files man
 %defattr(0644,root,root,0755)
